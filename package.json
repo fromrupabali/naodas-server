@@ -1,0 +1,32 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "A grossary products marketplace",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "mamato vai developer team",
+  "license": "ISC",
+  "dependencies": {
+    "@graphql-tools/merge": "^6.2.10",
+    "apollo-server": "^2.21.1",
+    "apollo-server-express": "^2.21.1",
+    "aws-sdk": "^2.884.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "graphql-tools": "^4.0.8",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.12.0",
+    "node-cron": "^3.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  },
+  "engines": {
+    "node": "12.18.2",
+    "npm": "7.5.2"
+  }
+}
