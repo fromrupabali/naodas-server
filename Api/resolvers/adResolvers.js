@@ -1,51 +1,118 @@
-const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
+const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
 
-const Ad = require('../models/ad');
-const User = require('../models/user');
+const Ad = require("../models/ad");
+const User = require("../models/user");
 
+const others = async (user, adId) => {
+  try {
+    console.log("others",adId);
+    const ads = await Ad.find({ user: user, _id:{$ne:adId}});
+    return ads.map((ad) => {
+      return {
+        ...ad._doc,
+      };
+    });
+  } catch (error) {
+    throw error;
+  }
+};
 
 module.exports = {
-    Query:{
-      
-    },
-    Mutation:{
-      createAd: async(args, req) =>{
-          try{
-             const decodedToken = jwt.verify(req.adInput.token, process.env.SECRET_KEY);
-             const user = await User.findById(decodedToken.userId);
-             console.log("User", user);
-             const ad = new Ad({
-                 _id: new mongoose.Types.ObjectId(),
-                 title: req.adInput.title,
-                 priceType: req.adInput.priceType,
-                 price: req.adInput.price,
-                 categoryId: req.adInput.categoryId,
-                 categoryName: req.adInput.categoryName,
-                 subcategoryId: req.adInput.subcategoryId,
-                 subcategoryName: req.adInput.subcategoryName,
-                 quantity: req.adInput.quantity,
-                 description: req.adInput.description,
-                 images: req.adInput.images,
-                 plan: req.adInput.plan,
-                 planDetails: req.adInput.planDetails,
-                 country: req.adInput.country,
-                 city:req.adInput.city,
-                 area: req.adInput.area,
-                 shippingType: req.adInput.shippingType,
-                 collectionPrice: req.adInput.collectionPrice,
-                 contactType: req.adInput.contactType,
-                 contactPhone: req.adInput.contactPhone,
-                 user: user._id,
-             });
-             console.log(ad);
-
-             return{
-                 ...ad._doc
-             }
-          }catch(error){
-              throw error;
-          }
+  Query: {
+    homePageAds: async (args, req) => {
+      try {
+        const ads = await Ad.find({ planName: "HOME_PAGE" }).sort({
+          createdAt: -1,
+        });
+        console.log(ads);
+        return ads.map((ad) => {
+          return {
+            ...ad._doc,
+          };
+        });
+      } catch (error) {
+        throw error;
       }
-    }
-}
+    },
+    searchAds: async (args, req) => {
+      try {
+        const ads = await Ad.find({ $text: { $search: req.searchText } });
+        return ads.map((ad) => {
+          return {
+            ...ad._doc,
+          };
+        });
+      } catch (error) {
+        throw error;
+      }
+    },
+    singleAd: async (args, req) => {
+      try {
+        const ad = await Ad.findById(req.adId);
+        if (!ad) {
+          throw new Error("Ad noy found");
+        }
+        return {
+          ad,
+          otherAds: others.bind(this, ad.user, ad._id),
+        };
+      } catch (error) {
+        throw error;
+      }
+    },
+  },
+  Mutation: {
+    createAd: async (args, req) => {
+      try {
+        const decodedToken = jwt.verify(
+          req.input.token,
+          process.env.SECRET_KEY
+        );
+        const user = await User.findById(decodedToken.userId);
+        console.log("User", user);
+        const ad = new Ad({
+          _id: new mongoose.Types.ObjectId(),
+          title: req.input.title,
+          priceType: req.input.priceType,
+          price: req.input.price,
+          categoryId: req.input.categoryId,
+          categoryName: req.input.categoryName,
+          subcategoryId: req.input.subcategoryId,
+          subcategoryName: req.input.subcategoryName,
+          quantity: req.input.quantity,
+          description: req.input.description,
+          images: req.input.images,
+          planName: req.input.planName,
+          days: req.input.days,
+          planStartDate: req.input.planStartDate,
+          planEndDate: req.input.planEndDate,
+          country: req.input.country,
+          city: req.input.city,
+          address: req.input.address,
+          shippingType: req.input.shippingType,
+          collectionPrice: req.input.collectionPrice,
+          contactType: req.input.contactType,
+          contactPhone: req.input.contactPhone,
+          user: user._id,
+          createdAt: new Date().toISOString(),
+        });
+        console.log(ad);
+
+        await ad.save();
+        user.ads.push(ad._id);
+        await user.save();
+
+        return {
+          ...ad._doc,
+        };
+
+        return {
+          ...ad._doc,
+        };
+      } catch (error) {
+        throw error;
+      }
+    },
+  },
+};

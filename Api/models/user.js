@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema({
     default: false,
   },
   ads: [String],
+  watchAds:[String]
 });
 
 module.exports = mongoose.model("UserN", userSchema);

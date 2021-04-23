@@ -4,7 +4,8 @@ const adSchema = new mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     title:{
         type: String,
-        required: true
+        required: true,
+        text: true
     },
     priceType:{
         type: String,
@@ -84,8 +85,12 @@ const adSchema = new mongoose.Schema({
     sold:{
         type: Boolean,
         default: false
+    },
+    reviews:[String],
+    watchingUsers:[String],
+    createdAt:{
+        type: String
     }
-
 });
 
 module.exports = mongoose.model('Ad', adSchema);
