@@ -1,13 +1,18 @@
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 
+var Secret_Key =
+  "sk_test_51IzHbbEF1W6drQ5LpnjboZ2Os8wHseoxQYJQvX6rkWqVbPW6NkP8skJ9FVuMS0qyN5REmJt2dh393OvIa9NAzfiE00JMu37HMh";
+
+const stripe = require("stripe")(Secret_Key);
+
 const Ad = require("../models/ad");
 const User = require("../models/user");
 
 const others = async (user, adId) => {
   try {
-    console.log("others",adId);
-    const ads = await Ad.find({ user: user, _id:{$ne:adId}});
+    console.log("others", adId);
+    const ads = await Ad.find({ user: user, _id: { $ne: adId } });
     return ads.map((ad) => {
       return {
         ...ad._doc,
@@ -71,6 +76,10 @@ module.exports = {
         );
         const user = await User.findById(decodedToken.userId);
         console.log("User", user);
+        let planName = "FREE";
+        if (req.input.planName) {
+          planName = "HOME_PAGE";
+        }
         const ad = new Ad({
           _id: new mongoose.Types.ObjectId(),
           title: req.input.title,
@@ -83,7 +92,7 @@ module.exports = {
           quantity: req.input.quantity,
           description: req.input.description,
           images: req.input.images,
-          planName: req.input.planName,
+          planName: planName,
           days: req.input.days,
           planStartDate: req.input.planStartDate,
           planEndDate: req.input.planEndDate,
@@ -110,6 +119,48 @@ module.exports = {
         return {
           ...ad._doc,
         };
+      } catch (error) {
+        throw error;
+      }
+    },
+    payment: async (args, req) => {
+      try {
+        const customer = await stripe.customers.create({
+          email: req.email,
+          source: req.source,
+          name: req.email,
+        });
+        const charge = await stripe.charges.create({
+          customer: customer.id,
+          amount: req.amount * 100,
+          currency: "usd",
+        });
+
+        if (charge.status == "succeeded") {
+          console.log("Payment successfull.", req.adId);
+          const ad = await Ad.findById(req.adId);
+          console.log("Find ad", ad);
+          await ad.updateOne({
+            paid: true,
+          });
+          const updatedAd = await Ad.findById(req.adId);
+          console.log("updated Ad", updatedAd);
+
+          // const order = await Order.findById(req.orderId);
+          // await order.updateOne({
+          //     paid: true,
+          //     cardId: req.source
+          // });
+          // const resturant = await Resturant.findById(order.resturant);
+          // await resturant.updateOne({
+          //      total_sale: resturant.total_sale + order.total,
+          //      current_balance: resturant.current_balance + order.total
+          // });
+
+          // return{
+          //     ...order._doc
+          // }
+        }
       } catch (error) {
         throw error;
       }

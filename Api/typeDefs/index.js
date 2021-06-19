@@ -76,6 +76,7 @@ module.exports = gql`
     contactType: String
     conatctPhone: String
     token: String
+    paid: Boolean
   }
   type AdView{
     ad: Ad!
@@ -128,6 +129,9 @@ module.exports = gql`
     createAd(input: AdCreateInput): Ad!
 
     #ADMIN
+
+    #PAYMENT
+    payment(source: String!, adId: String!, amount: Int!, email:String): User!
 
     #FILE UPLOAD
     uploadToAws(file: Upload!): File!

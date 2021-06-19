@@ -8,6 +8,7 @@ module.exports = {
     },
     Mutation:{
         uploadToAws: async(parent,{ file })=>{
+            console.log("file uploading starting...");
             const { createReadStream, filename, mimetype, encoding } = await file;
 
             const { Location } = await s3.upload({

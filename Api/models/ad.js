@@ -9,7 +9,7 @@ const adSchema = new mongoose.Schema({
     },
     priceType:{
         type: String,
-        required: true
+      
     },
     price:{
         type: Number,
@@ -66,7 +66,7 @@ const adSchema = new mongoose.Schema({
     },
     shippingType:{
         type:String,
-        required: true
+        
     },
     collectionPrice:{
         type:Number

@@ -81,8 +81,10 @@ module.exports = {
     userAds: async(args, req) =>{
       const decodedToken = jwt.verify(req.token, process.env.SECRET_KEY);
       const user = await User.findById(decodedToken.userId);
+      console.log("User", user);
 
-      const ads = await Watch.find({ _id: { $in: user.ads } });
+      const ads = await Ad.find({ _id: { $in: user.ads } });
+      console.log("Ads", ads);
       return ads.map(ad=>{
         return{
           ...ad._doc
