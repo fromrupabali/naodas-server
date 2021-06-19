@@ -52,6 +52,18 @@ module.exports = {
         throw error;
       }
     },
+    categoryAds: async (args, req) => {
+      try {
+        const ads = await Ad.find({ categoryId: req.catId });
+        return ads.map((ad) => {
+          return {
+            ...ad._doc,
+          };
+        });
+      } catch (error) {
+        throw error;
+      }
+    },
     singleAd: async (args, req) => {
       try {
         const ad = await Ad.findById(req.adId);

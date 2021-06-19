@@ -108,6 +108,7 @@ module.exports = gql`
     userAds(token: String!):[Ad!]
 
     #CATEGORY
+    categoryAds(catId:String!):[Ad!]
 
     #ADMIN
   }
