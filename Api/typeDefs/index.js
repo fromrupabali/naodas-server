@@ -51,7 +51,8 @@ module.exports = gql`
     conatctPhone: String
     user: String
     sold: Boolean
-    watchingUsers:[String]
+    watchingUsers: [String]
+    createdAt: String
   }
   input AdCreateInput {
     title: String
@@ -78,22 +79,22 @@ module.exports = gql`
     token: String
     paid: Boolean
   }
-  type AdView{
+  type AdView {
     ad: Ad!
-    otherAds:[Ad!]
+    otherAds: [Ad!]
   }
 
   #FILE
   type File {
     url: String
   }
-  
+
   #Watch
-  type Watch{
-      _id: ID
-      userId: String
-      adId: String
-      ad:Ad
+  type Watch {
+    _id: ID
+    userId: String
+    adId: String
+    ad: Ad
   }
   type Query {
     #USER
@@ -101,14 +102,14 @@ module.exports = gql`
     user(token: String!): User!
 
     #AD
-    homePageAds:[Ad!]
-    searchAds(searchText:String!):[Ad!]
-    watchAds(token: String!):[Watch!]
+    homePageAds(skip: Int): [Ad!]
+    searchAds(searchText: String!): [Ad!]
+    watchAds(token: String!): [Watch!]
     singleAd(adId: String!): AdView!
-    userAds(token: String!):[Ad!]
+    userAds(token: String!): [Ad!]
 
     #CATEGORY
-    categoryAds(catId:String!):[Ad!]
+    categoryAds(catId: String!): [Ad!]
 
     #ADMIN
   }
@@ -124,7 +125,7 @@ module.exports = gql`
       newPassword: String!
       oldPassword: String!
     ): AuthData!
-    watchAd(userId:String!, adId:String!):Ad!
+    watchAd(userId: String!, adId: String!): Ad!
 
     #AD
     createAd(input: AdCreateInput): Ad!
@@ -132,7 +133,7 @@ module.exports = gql`
     #ADMIN
 
     #PAYMENT
-    payment(source: String!, adId: String!, amount: Int!, email:String): User!
+    payment(source: String!, adId: String!, amount: Int!, email: String): User!
 
     #FILE UPLOAD
     uploadToAws(file: Upload!): File!

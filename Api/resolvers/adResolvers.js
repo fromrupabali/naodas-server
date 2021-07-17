@@ -27,9 +27,12 @@ module.exports = {
   Query: {
     homePageAds: async (args, req) => {
       try {
-        const ads = await Ad.find({ planName: "HOME_PAGE" }).sort({
-          createdAt: -1,
-        });
+        const ads = await Ad.find({ planName: "HOME_PAGE" })
+          .sort({
+            createdAt: -1,
+          })
+          .skip(req.skip)
+          .limit(12);
         console.log(ads);
         return ads.map((ad) => {
           return {
